@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.5)
 
 project(rosidl_typesupport_fastrtps_c)
 
+include(CheckLibraryExists)
+check_library_exists(atomic __atomic_load_8 "" HAVE_LIBATOMICS)
+
 if(DEFINED ENV{FASTRTPS_STATIC_DISABLE})
   set(FASTRTPS_STATIC_DISABLE $ENV{FASTRTPS_STATIC_DISABLE}
     CACHE BOOL "If fastrtps Static should be disabled.")
@@ -94,6 +97,9 @@ if(BUILD_TESTING)
       ${osrf_testing_tools_cpp_INCLUDE_DIRS})
     target_link_libraries(test_wstring_conversion
       ${PROJECT_NAME})
+    if(HAVE_LIBATOMICS)
+      target_link_libraries(test_wstring_conversion atomic)
+    endif()
   endif()
 
   ament_add_gtest(test_wstring_conversion_mem test/test_wstring_conversion_mem.cpp
